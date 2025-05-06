@@ -72,6 +72,16 @@ else
 fi
 echo ""
 
+read -p "Do you want to delete these empty directories? (y/N): " response
+if [[ "$response" =~ ^[Yy]$ ]]; then
+  echo "Deleting empty directories..."
+  find /home/deck/ -maxdepth 1 -type d -empty -delete
+  echo "-> Empty directories removal complete."
+else
+  echo "-> No directories will be deleted."
+fi
+echo "" 
+
 # Remove uninstalled game compatdata 
 echo "Removing uninstalled game compatdata..."
 curl -sSL https://raw.githubusercontent.com/scawp/Steam-Deck.Shader-Cache-Killer/main/zShaderCacheKiller.sh | bash to run zShaderCacheKiller 
