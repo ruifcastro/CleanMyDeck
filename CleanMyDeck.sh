@@ -85,11 +85,3 @@ echo "Opening the common games folder in Dolphin for manual cleanup..."
 dolphin "/home/deck/.steam/steam/steamapps/common/"
 echo ""
 
-# Open the common games folder in Dolphin for manual cleanup
-echo "Opening the compatdata games folder in Dolphin for manual cleanup..."
-dolphin "/home/deck/.steam/steam/steamapps/compatdata/"
-echo ""
-
-echo "Automatic cleanup steps finished."
-echo "Please manually review the folders that opened in Dolphin to delete any unwanted game files."
-echo ""
