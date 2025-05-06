@@ -21,7 +21,7 @@ echo "-> Download files removal complete."
 echo ""
 
 # Clean unused flatpak apps
-echo "Clean unused flatpak apps..."
+echo "Removing unused flatpak apps..."
 flatpak uninstall --unused
 # flatpak repair
 echo ""
@@ -77,7 +77,7 @@ echo "And now, Your Current Home Disk Usage..."
 du -sh /home/
 echo ""
 
-echo "Steam Deck cleanup finished. Here's some extra manual steps:"
+echo "Steam Deck cleanup finished."
 echo ""
 
 # Open the common games folder in Dolphin for manual cleanup
