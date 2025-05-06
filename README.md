@@ -19,3 +19,5 @@ Here are the sections in the script:
 - Remove Steam logs
 - Disabling and removing swap file. It comes back as the default 1 Gb size
 - Searching for and deleting librarycache folders in the Userdata folder which helps fix the Activity Bug
+- Deleting empty directories
+- Remove uninstalled game compatdata
