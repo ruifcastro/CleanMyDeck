@@ -16,7 +16,7 @@ echo ""
 
 # Remove downloading game files
 echo "Removing downloading game files..."
-rm -rf /home/deck/.steam/steam/steamapps/downloading
+rm -rf /home/deck/.steam/steam/steamapps/downloading/
 echo "-> Download files removal complete."
 echo ""
 
@@ -28,7 +28,7 @@ echo ""
 
 # Remove shader caches
 echo "Removing shader caches..."
-rm -rf /home/deck/.steam/steam/steamapps/shadercache
+rm -rf /home/deck/.steam/steam/steamapps/shadercache/
 echo "-> Shader cache removal complete."
 echo ""
 
@@ -40,7 +40,7 @@ echo ""
 
 # Remove Steam logs
 echo "Removing Steam logs..."
-rm -rf /home/deck/.local/share/Steam/logs
+rm -rf /home/deck/.local/share/Steam/logs/
 echo "-> Steam logs removal complete."
 echo ""
 
