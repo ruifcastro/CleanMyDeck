@@ -1,106 +1,155 @@
 #!/bin/bash
 
 # This script cleans up various temporary and cached files on a Steam Deck
-# It removes downloading game files, shader caches, library cache, logs,
-# and disables/removes the swap file.
-
-# Exit immediately if a command exits with a non-zero status
-set -e
+# It allows you to select which cleanup options to execute, with an option for all.
 
 echo "Starting Steam Deck cleanup..."
 echo ""
 
 echo "Your Current Home Disk Usage..."
 du -sh /home/
-echo "" 
-
-# Remove downloading game files
-echo "Removing downloading game files..."
-rm -rf /home/deck/.steam/steam/steamapps/downloading/
-echo "-> Download files removal complete."
 echo ""
 
-# Clean unused flatpak apps
-echo "Removing unused flatpak apps..."
-flatpak uninstall --unused
-# flatpak repair
-echo ""
+OPTIONS=(
+  "Remove downloading game files"
+  "Clean unused flatpak apps"
+  "Remove shader caches"
+  "Remove old banner library cache"
+  "Remove Steam logs"
+  "Disable and reduce swap file size"
+  "Remove Steam config/librarycache"
+  "Remove empty directories"
+  "Remove uninstalled game compatdata (using zShaderCacheKiller.sh)"
+  "Open the common games folder in Dolphin for manual cleanup"
+)
 
-# Remove shader caches
-echo "Removing shader caches..."
-rm -rf /home/deck/.steam/steam/steamapps/shadercache/
-echo "-> Shader cache removal complete."
-echo ""
+FUNCTIONS=(
+  "remove_downloading_files"
+  "clean_flatpak_apps"
+  "remove_shader_cache"
+  "remove_library_cache"
+  "remove_steam_logs"
+  "cleanup_swap"
+  "remove_config_library_cache"
+  "remove_empty_dirs"
+  "remove_compatdata"
+  "open_dolphin"
+)
 
-# Remove old banner library cache
-echo "Removing old banner library cache..."
-rm -rf /home/deck/.local/share/Steam/appcache/librarycache/
-echo "-> Library cache removal complete."
-echo ""
+# Function definitions
+remove_downloading_files() {
+  rm -rf /home/deck/.steam/steam/steamapps/downloading/
+  echo "-> Download files removal complete."
+}
 
-# Remove Steam logs
-echo "Removing Steam logs..."
-rm -rf /home/deck/.local/share/Steam/logs/
-echo "-> Steam logs removal complete."
-echo ""
+clean_flatpak_apps() {
+  flatpak uninstall --unused
+  # flatpak repair
+}
 
-# Disable and reduce swap file size
-echo "Disabling and reduce swap file size..."
-# Check if swapfile exists before trying to disable/remove
-if [ -f /home/swapfile ]; then
+remove_shader_cache() {
+  rm -rf /home/deck/.steam/steam/steamapps/shadercache/
+  echo "-> Shader cache removal complete."
+}
+
+remove_library_cache() {
+  rm -rf /home/deck/.local/share/Steam/appcache/librarycache/
+  echo "-> Library cache removal complete."
+}
+
+remove_steam_logs() {
+  rm -rf /home/deck/.local/share/Steam/logs/
+  echo "-> Steam logs removal complete."
+}
+
+cleanup_swap() {
+  if [ -f /home/swapfile ]; then
     sudo swapoff /home/swapfile
     sudo rm -r /home/swapfile
     echo "-> Swap file cleanup complete."
-else
+  else
     echo "-> No swap file found at /home/swapfile. Skipping swap cleanup."
-fi
-echo ""
+  fi
+}
 
-# Define the base path where the userdata directories are located
-STEAM_USERDATA_PATH="/home/deck/.local/share/Steam/userdata"
-if [ -d "$STEAM_USERDATA_PATH" ]; then 
-    # Find all directories named 'librarycache' under each user ID's config folder
-    # and delete them recursively and forcefully.
-    echo "Searching for and deleting librarycache folders under $STEAM_USERDATA_PATH..."
-
+remove_config_library_cache() {
+  STEAM_USERDATA_PATH="/home/deck/.local/share/Steam/userdata"
+  if [ -d "$STEAM_USERDATA_PATH" ]; then
     find "$STEAM_USERDATA_PATH" -type d -path "*/config/librarycache" -print -exec rm -rf {} +
-
     echo "-> Steam config/librarycache removal complete."
-else
-    echo "Searching for and deleting librarycache folders under $STEAM_USERDATA_PATH..."
+  else
     echo "-> No Steam userdata found. Skipping config/librarycache cleanup."
-fi
+  fi
+}
+
+remove_empty_dirs() {
+  read -p "Do you want to delete these empty directories? (y/N): " response
+  if [[ "$response" =~ ^[Yy]$ ]]; then
+    find /home/deck/ -maxdepth 1 -type d -empty -delete
+    echo "-> Empty directories removal complete."
+  else
+    echo "-> No directories will be deleted."
+  fi
+}
+
+remove_compatdata() {
+  curl -sSL https://raw.githubusercontent.com/scawp/Steam-Deck.Shader-Cache-Killer/main/zShaderCacheKiller.sh | bash
+  echo "-> Uninstalled game compatdata removal complete."
+}
+
+open_dolphin() {
+  dolphin "/home/deck/.steam/steam/steamapps/common/"
+}
+
+# Present the options
+echo "Select the options you want to execute (separated by spaces or commas, or '0' for all):"
+echo ""
+echo "0. All options"
+for i in "${!OPTIONS[@]}"; do
+  echo "$((i+1)). ${OPTIONS[$i]}"
+done
 echo ""
 
-read -p "Do you want to delete these empty directories? (y/N): " response
-if [[ "$response" =~ ^[Yy]$ ]]; then
-  echo "Deleting empty directories..."
-  find /home/deck/ -maxdepth 1 -type d -empty -delete
-  echo "-> Empty directories removal complete."
-else
-  echo "-> No directories will be deleted."
-fi
-echo "" 
+read -p "Enter your choices: " choices
 
-# Remove uninstalled game compatdata 
-echo "Removing uninstalled game compatdata..."
-curl -sSL https://raw.githubusercontent.com/scawp/Steam-Deck.Shader-Cache-Killer/main/zShaderCacheKiller.sh | bash to run zShaderCacheKiller 
-echo "-> Uninstalled game compatdata removal complete."
+# Process the user's choices
+if [[ "$choices" == "0" ]]; then
+  echo ""
+  echo "----------------------------------------"
+  echo "Executing all options..."
+  echo "----------------------------------------"
+  for i in "${!FUNCTIONS[@]}"; do
+    echo ""
+    echo "----------------------------------------"
+    echo "Executing: ${OPTIONS[$i]}"
+    "${FUNCTIONS[$i]}"
+    echo "----------------------------------------"
+  done
+else
+  IFS=', ' read -ra SELECTED_OPTIONS <<< "$choices"
+
+  for option_index_str in "${SELECTED_OPTIONS[@]}"; do
+    if [[ "$option_index_str" =~ ^[0-9]+$ ]]; then
+      option_index=$((option_index_str - 1))
+      if [[ "$option_index" -ge 0 && "$option_index" -lt "${#FUNCTIONS[@]}" ]]; then
+        echo ""
+        echo "----------------------------------------"
+        echo "Executing: ${OPTIONS[$option_index]}"
+        "${FUNCTIONS[$option_index]}"
+        echo "----------------------------------------"
+      else
+        echo "Invalid option: $option_index_str"
+      fi
+    else
+      echo "Invalid input: $option_index_str"
+    fi
+  done
+fi
+
+echo ""
+echo "Cleanup process completed based on your selections."
 echo ""
 
 echo "And now, Your Current Home Disk Usage..."
-# df -h /home/
 du -sh /home/
-echo ""
-
-echo "Steam Deck cleanup finished."
-echo ""
-
-# Open the common games folder in Dolphin for manual cleanup
-echo "Opening the common games folder in Dolphin for manual cleanup..."
-dolphin "/home/deck/.steam/steam/steamapps/common/"
-echo ""
-
-echo "Automatic cleanup steps finished."
-echo "Please manually review the folders that opened in Dolphin to delete any unwanted game files."
 echo ""
