@@ -44,8 +44,8 @@ rm -rf /home/deck/.local/share/Steam/logs
 echo "-> Steam logs removal complete."
 echo ""
 
-# Disable and remove swap file
-echo "Disabling and removing swap file..."
+# Disable and reduce swap file size
+echo "Disabling and reduce swap file size..."
 # Check if swapfile exists before trying to disable/remove
 if [ -f /home/swapfile ]; then
     sudo swapoff /home/swapfile
@@ -91,3 +91,6 @@ echo "Opening the common games folder in Dolphin for manual cleanup..."
 dolphin "/home/deck/.steam/steam/steamapps/common/"
 echo ""
 
+echo "Automatic cleanup steps finished."
+echo "Please manually review the folders that opened in Dolphin to delete any unwanted game files."
+echo ""
