@@ -20,8 +20,8 @@ rm -rf /home/deck/.steam/steam/steamapps/downloading
 echo "Download files removal complete."
 echo ""
 
-# Clean flatpak
-echo "Clean flatpak..."
+# Clean unused flatpak apps
+echo "Clean unused flatpak apps..."
 flatpak uninstall --unused
 # flatpak repair
 echo ""
@@ -32,8 +32,8 @@ rm -rf /home/deck/.steam/steam/steamapps/shadercache
 echo "Shader cache removal complete."
 echo ""
 
-# Remove library cache
-echo "Removing library cache..."
+# Remove old banner library cache
+echo "Removing old banner library cache..."
 rm -rf /home/deck/.local/share/Steam/appcache/librarycache/
 echo "Library cache removal complete."
 echo ""
@@ -58,13 +58,7 @@ echo ""
 
 # Define the base path where the userdata directories are located
 STEAM_USERDATA_PATH="/home/deck/.local/share/Steam/userdata"
-if [ -f /home/deck/.local/share/Steam/userdata ]; then
-    # Check if the base path exists
-    if [ ! -d "$STEAM_USERDATA_PATH" ]; then
-      echo "Error: Steam userdata path not found at $STEAM_USERDATA_PATH"
-      exit 1
-    fi
-
+if [ ! -d "$STEAM_USERDATA_PATH" ]; then 
     # Find all directories named 'librarycache' under each user ID's config folder
     # and delete them recursively and forcefully.
     echo "Searching for and deleting librarycache folders under $STEAM_USERDATA_PATH..."
