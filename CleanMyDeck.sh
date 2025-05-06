@@ -72,6 +72,12 @@ else
 fi
 echo ""
 
+# Remove uninstalled game compatdata 
+echo "Removing uninstalled game compatdata..."
+curl -sSL https://raw.githubusercontent.com/scawp/Steam-Deck.Shader-Cache-Killer/main/zShaderCacheKiller.sh | bash to run zShaderCacheKiller 
+echo "-> Uninstalled game compatdata removal complete."
+echo ""
+
 echo "And now, Your Current Home Disk Usage..."
 # df -h /home/
 du -sh /home/
