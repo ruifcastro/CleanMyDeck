@@ -1,3 +1,8 @@
+This script cleans up various temporary and cached files on a Steam Deck.
+It removes downloading game files, shader caches, unused flakpaks, library cache, logs, and disables/removes the swap file.
+
+Here are the sections in the script:
+
 Remove the Steam download cache
 
 Remove unused flatpak apps
