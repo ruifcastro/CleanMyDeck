@@ -11,16 +11,16 @@ du -sh /home/
 echo ""
 
 OPTIONS=(
-  "Remove downloading game files"
-  "Clean unused flatpak apps"
-  "Remove shader caches"
-  "Remove old banner library cache"
+  "Remove Steam downloading game files"
+  "Remove Flatpak unused apps"
+  "Remove Steam shader caches"
+  "Remove Steam old banner library cache"
   "Remove Steam logs"
-  "Disable and reduce swap file size"
-  "Remove Steam config/librarycache"
+  "Disable and Reduce swap file size"
+  "Fix Steam Activity Tab bug (config/librarycache)"
   "Remove empty directories"
-  "Remove uninstalled game compatdata (using zShaderCacheKiller.sh)"
-  "Open the common games folder in Dolphin for manual cleanup"
+  "Manual removal of uninstalled game compatdata (using zShaderCacheKiller.sh)"
+  "Manual removal of common games folder in Dolphin"
 )
 
 FUNCTIONS=(
