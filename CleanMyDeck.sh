@@ -7,33 +7,37 @@ echo "Starting Steam Deck cleanup..."
 echo ""
 
 echo "Your Current Home Disk Usage..."
-du -sh /home/
+df -h /
 echo ""
 
 OPTIONS=(
-  "Remove Steam downloading game files"
-  "Remove Flatpak unused apps"
-  "Remove Steam shader caches"
-  "Remove Steam old banner library cache"
-  "Remove Steam logs"
-  "Disable and Reduce swap file size"
-  "Fix Steam Activity Tab bug (config/librarycache)"
-  "Remove empty directories"
-  "Manual removal of uninstalled game compatdata (using zShaderCacheKiller.sh)"
-  "Manual removal of common games folder in Dolphin"
+  "Remove Steam Download Cache"
+  "Remove Flatpak Unused Apps"
+  "Repair Flatpak"
+  "Remove Steam Shader Caches"
+  "Remove Steam Old Banner Library Cache"
+  "Remove Steam Logs"
+  "Remove Trash"
+  "Reduce Swapfile Size"
+  "Fix Steam Activity Tab Stuck Bug (config/librarycache)"
+  "Remove User Cache"
+  "Manual Removal of Uninstalled Game Compatdata (using zShaderCacheKiller.sh)"
+  "Manual removal of Common Game Folders (using Dolphin)"
 )
 
 FUNCTIONS=(
   "remove_downloading_files"
-  "clean_flatpak_apps"
+  "remove_flatpak_unused_apps"
+  "repair_flatpak"
   "remove_shader_cache"
   "remove_library_cache"
   "remove_steam_logs"
-  "cleanup_swap"
-  "remove_config_library_cache"
-  "remove_empty_dirs"
+  "remove_trash"
+  "reduce_swap"
+  "fix_config_library_cache"
+  "remove_user_cache"
   "remove_compatdata"
-  "open_dolphin"
+  "open_dolphin_common"
 )
 
 # Function definitions
@@ -42,14 +46,22 @@ remove_downloading_files() {
   echo "-> Download files removal complete."
 }
 
-clean_flatpak_apps() {
+remove_flatpak_unused_apps() {
   flatpak uninstall --unused
-  # flatpak repair
+}
+
+repair_flatpak() {
+  flatpak repair
 }
 
 remove_shader_cache() {
   rm -rf /home/deck/.steam/steam/steamapps/shadercache/
   echo "-> Shader cache removal complete."
+}
+
+remove_trash() {
+  rm -rf /home/deck/.local/share/Trash/
+  echo "-> Trash removal complete."
 }
 
 remove_library_cache() {
@@ -62,7 +74,13 @@ remove_steam_logs() {
   echo "-> Steam logs removal complete."
 }
 
-cleanup_swap() {
+remove_user_cache() {
+  rm -rf /home/deck/.cache/
+  echo "-> User Cache removal complete."
+}
+
+
+reduce_swap() {
   if [ -f /home/swapfile ]; then
     sudo swapoff /home/swapfile
     sudo rm -r /home/swapfile
@@ -72,7 +90,7 @@ cleanup_swap() {
   fi
 }
 
-remove_config_library_cache() {
+fix_config_library_cache() {
   STEAM_USERDATA_PATH="/home/deck/.local/share/Steam/userdata"
   if [ -d "$STEAM_USERDATA_PATH" ]; then
     find "$STEAM_USERDATA_PATH" -type d -path "*/config/librarycache" -print -exec rm -rf {} +
@@ -85,7 +103,7 @@ remove_config_library_cache() {
 remove_empty_dirs() {
   read -p "Do you want to delete these empty directories? (y/N): " response
   if [[ "$response" =~ ^[Yy]$ ]]; then
-    find /home/deck/ -maxdepth 1 -type d -empty -delete
+    find /home/deck/.local/share/ -maxdepth 1 -type d -empty -delete
     echo "-> Empty directories removal complete."
   else
     echo "-> No directories will be deleted."
@@ -97,7 +115,7 @@ remove_compatdata() {
   echo "-> Uninstalled game compatdata removal complete."
 }
 
-open_dolphin() {
+open_dolphin_common() {
   dolphin "/home/deck/.steam/steam/steamapps/common/"
 }
 
@@ -151,5 +169,5 @@ echo "Cleanup process completed based on your selections."
 echo ""
 
 echo "And now, Your Current Home Disk Usage..."
-du -sh /home/
+df -h /
 echo ""
