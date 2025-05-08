@@ -11,13 +11,16 @@ sudo ./CleanMyDeck.sh
 
 
 Here are the sections in the script:
-
-- Remove the Steam download cache
-- Remove unused flatpak apps
-- Remove all shader caches. This way only the active games you start play are the ones the the Steam Deck will download daily
-- Remove library cache which gets full of old games you checked out
-- Remove Steam logs
-- Disabling and removing swap file. It comes back as the default 1 Gb size
-- Searching for and deleting librarycache folders in the Userdata folder which helps fix the Activity Bug
-- Remove empty folders
-- Remove uninstalled game compatdata
+- Remove Steam Download Cache
+- Remove Flatpak Unused Apps
+- Repair Flatpak
+- Remove Steam Shader Caches. This way only the active games you start play are the ones the the Steam Deck will download daily
+- Remove Steam Old Banner Library Cache
+- Remove Steam Logs
+- Remove Trash
+- Reduce Swapfile Size. Special if you used CyroUilities in the past. The default size now is 1 Gb because we now use ZRAM.
+- Fix the Steam Activity Tab Bug where it gets stuck and you don't see any updates
+- Remove User Cache"
+- Manual Removal of Uninstalled Game Compatdata (using zShaderCacheKiller.sh)
+- Manual Removal of Common Game Folders (using Dolphin)
+- Execution Log File
