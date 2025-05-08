@@ -18,7 +18,7 @@ Here are the sections in the script:
 - Remove Steam Old Banner Library Cache
 - Remove Steam Logs
 - Remove Trash
-- Reduce Swapfile Size. Special if you used CyroUilities in the past. The default size now is 1 Gb because we now use ZRAM.
+- Reduce Swapfile Size. Specialy if you used CyroUilities in the past. The default size now is 1 Gb because we now use ZRAM.
 - Fix the Steam Activity Tab Bug where it gets stuck and you don't see any updates
 - Remove User Cache"
 - Manual Removal of Uninstalled Game Compatdata (using zShaderCacheKiller.sh)
