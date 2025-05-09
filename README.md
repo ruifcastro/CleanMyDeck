@@ -7,7 +7,7 @@ chmod +x CleanMyDeck.sh
 
 Run it like this:
 
-./CleanMyDeck.sh
+sudo ./CleanMyDeck.sh
 
 
 Here are the sections in the script:
