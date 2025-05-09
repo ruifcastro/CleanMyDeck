@@ -51,7 +51,8 @@ reboot_after_cleanup() {
     if [[ $XDG_SESSION_TYPE == "x11" && "$WAYLAND_DISPLAY" ]]; then
       zenity --info --text="Running inside a nested session.\nPlease reboot manually."
     else
-      systemctl reboot
+      # systemctl reboot
+      qdbus org.kde.Shutdown /Shutdown org.kde.Shutdown.logout
     fi
   fi
 }
@@ -169,7 +170,7 @@ reduce_swap() {
 fix_config_library_cache() {
   STEAM_USERDATA_PATH="/home/deck/.local/share/Steam/userdata"
   if [ -d "$STEAM_USERDATA_PATH" ]; then
-    find "$STEAM_USERDATA_PATH" -type d -path "*/config/librarycache/*" -print -exec rm -rf {} +
+    find "$STEAM_USERDATA_PATH" -type d -path "*/config/librarycache" -print -exec rm -rf {} +
   fi
 }
 
