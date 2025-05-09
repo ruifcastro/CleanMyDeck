@@ -18,7 +18,7 @@ OPTIONS=(
   "Disable Decky Loader Plugins"
   "Enable Decky Loader Plugins"
   "Disk Usage"
-  "Export Execution Log File"
+  "Execution Log File"
   "Reboot"
 )
 
@@ -60,7 +60,7 @@ execution_log_file() {
   zenity --question --text="Would you like to save a log file?" --width=400
   if [[ $? -eq 0 ]]; then
     SAVE_PATH=$(zenity --file-selection --save --confirm-overwrite \
-      --filename="$HOME/steamdeck-cleanup-$(date +%Y%m%d-%H%M%S).log" \
+      --filename="/home/deck/steamdeck-cleanup-$(date +%Y%m%d-%H%M%S).log" \
       --title="Save Cleanup Log As")
     if [[ -n "$SAVE_PATH" ]]; then
       cp "$TMP_LOG" "$SAVE_PATH"
@@ -70,10 +70,10 @@ execution_log_file() {
 }
 
 disk_usage() {
-  HOME_DIR="$HOME"
-  SHADERCACHE="$HOME/.steam/steam/steamapps/shadercache"
-  COMMON="$HOME/.steam/steam/steamapps/common"
-  COMPATDATA="$HOME/.steam/steam/steamapps/compatdata"
+  HOME_DIR="/home/deck/"
+  SHADERCACHE="/home/deck/.steam/steam/steamapps/shadercache"
+  COMMON="/home/deck/.steam/steam/steamapps/common"
+  COMPATDATA="/home/deck/.steam/steam/steamapps/compatdata"
   SWAPFILE="/home/swapfile"
   DECKY_LOADER="/home/deck/homebrew"
   DOWNLOADS="/home/deck/Downloads"
@@ -132,7 +132,7 @@ disk_usage() {
 
 
 remove_downloading_files() {
-  rm -rf "$HOME/.steam/steam/steamapps/downloading/*"
+  rm -rf "/home/deck/.steam/steam/steamapps/downloading/*"
 }
 
 remove_flatpak_unused_apps() {
@@ -144,19 +144,19 @@ repair_flatpak() {
 }
 
 remove_shader_cache() {
-  rm -rf "$HOME/.steam/steam/steamapps/shadercache/*"
+  rm -rf "/home/deck/.steam/steam/steamapps/shadercache/*"
 }
 
 remove_library_cache() {
-  rm -rf "$HOME/.local/share/Steam/appcache/librarycache/*"
+  rm -rf "/home/deck/.local/share/Steam/appcache/librarycache/*"
 }
 
 remove_steam_logs() {
-  rm -rf "$HOME/.local/share/Steam/logs/*"
+  rm -rf "/home/deck/.local/share/Steam/logs/*"
 }
 
 remove_trash() {
-  rm -rf "$HOME/.local/share/Trash/*"
+  rm -rf "/home/deck/.local/share/Trash/*"
 }
 
 reduce_swap() {
@@ -167,14 +167,14 @@ reduce_swap() {
 }
 
 fix_config_library_cache() {
-  STEAM_USERDATA_PATH="$HOME/.local/share/Steam/userdata"
+  STEAM_USERDATA_PATH="/home/deck/.local/share/Steam/userdata"
   if [ -d "$STEAM_USERDATA_PATH" ]; then
     find "$STEAM_USERDATA_PATH" -type d -path "*/config/librarycache/*" -print -exec rm -rf {} +
   fi
 }
 
 remove_user_cache() {
-  rm -rf "$HOME/.cache/"
+  rm -rf "/home/deck/.cache/"
 }
 
 remove_compatdata() {
@@ -182,12 +182,12 @@ remove_compatdata() {
 }
 
 open_dolphin_common() {
-  dolphin "$HOME/.steam/steam/steamapps/common/"
+  dolphin "/home/deck/.steam/steam/steamapps/common/"
 }
 
 disable_decky_plugins() {
-  PLUGIN_DIR="$HOME/homebrew/plugins"
-  BACKUP_DIR="$HOME/homebrew/plugins_backup"
+  PLUGIN_DIR="/home/deck/homebrew"
+  BACKUP_DIR="/home/deck/homebrew_backup"
 
   if [ ! -d "$PLUGIN_DIR" ]; then
     zenity --error --text="Decky plugins folder not found at:\n$PLUGIN_DIR"
@@ -206,8 +206,8 @@ disable_decky_plugins() {
 }
 
 enable_decky_plugins() {
-  PLUGIN_DIR="$HOME/homebrew/plugins"
-  BACKUP_DIR="$HOME/homebrew/plugins_backup"
+  PLUGIN_DIR="/home/deck/homebrew"
+  BACKUP_DIR="/home/deck/homebrew_backup"
 
   if [ ! -d "$BACKUP_DIR" ]; then
     zenity --error --text="No plugin backup found at:\n$BACKUP_DIR"
@@ -299,3 +299,4 @@ while true; do
 	  echo "$LOG_OUTPUT" | tee "$TMP_LOG" | zenity --text-info --title="Steam Deck Cleanup - Combined Log" --width=700 --height=500
 	fi
 done
+
