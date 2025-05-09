@@ -15,6 +15,8 @@ OPTIONS=(
   "Remove User Cache"
   "Manual Removal of Uninstalled Game Compatdata (using zShaderCacheKiller.sh)"
   "Manual Removal of Common Game Folders (using Dolphin)"
+  "Disable Decky Loader Plugins"
+  "Enable Decky Loader Plugins"
   "Disk Usage"
   "Execution Log File"
   "Reboot"
@@ -33,6 +35,8 @@ FUNCTIONS=(
   "remove_user_cache"
   "remove_compatdata"
   "open_dolphin_common"
+  "disable_decky_plugins"
+  "enable_decky_plugins"
   "disk_usage"
   "execution_log_file"
   "reboot_after_cleanup"
@@ -66,8 +70,66 @@ execution_log_file() {
 }
 
 disk_usage() {
-  du -sh "$HOME/"
+  HOME_DIR="$HOME"
+  SHADERCACHE="$HOME/.steam/steam/steamapps/shadercache"
+  COMMON="$HOME/.steam/steam/steamapps/common"
+  COMPATDATA="$HOME/.steam/steam/steamapps/compatdata"
+  SWAPFILE="/home/swapfile"
+  DECKY_LOADER="/home/deck/homebrew"
+  DOWNLOADS="/home/deck/Downloads"
+  FLATPAK="/home/deck/.var/app"
+  EMULATION="/home/deck/Emulation"
+
+  # Helper functions
+  get_size() {
+    [[ -e "$1" ]] && du -sh "$1" 2>/dev/null | cut -f1 || echo "Not found"
+  }
+
+  get_bytes() {
+    [[ -e "$1" ]] && du -sb "$1" 2>/dev/null | cut -f1 || echo "0"
+  }
+
+  # Get sizes in bytes
+  BYTES_HOME=$(get_bytes "$HOME_DIR")
+  BYTES_SHADER=$(get_bytes "$SHADERCACHE")
+  BYTES_COMMON=$(get_bytes "$COMMON")
+  BYTES_COMPAT=$(get_bytes "$COMPATDATA")
+  BYTES_SWAP=$(get_bytes "$SWAPFILE")
+
+  BYTES_GAMES=$((BYTES_SHADER + BYTES_COMMON + BYTES_COMPAT))
+  BYTES_NONSTEAM=$((BYTES_HOME - BYTES_GAMES + BYTES_SWAP))
+
+  # Human-readable conversions
+  SIZE_HOME=$(numfmt --to=iec "$BYTES_HOME")
+  SIZE_SHADER=$(numfmt --to=iec "$BYTES_SHADER")
+  SIZE_COMMON=$(numfmt --to=iec "$BYTES_COMMON")
+  SIZE_COMPAT=$(numfmt --to=iec "$BYTES_COMPAT")
+  SIZE_GAMING=$(numfmt --to=iec "$BYTES_GAMES")
+  SIZE_NONSTEAM=$(numfmt --to=iec "$BYTES_NONSTEAM")
+
+  # Other folders (already human-readable)
+  SIZE_DECKY=$(get_size "$DECKY_LOADER")
+  SIZE_DL=$(get_size "$DOWNLOADS")
+  SIZE_FLATPAK=$(get_size "$FLATPAK")
+  SIZE_EMU=$(get_size "$EMULATION")
+
+  # Display summary
+  zenity --info --title="Disk Usage Summary" --width=500 --height=450 --text="
+<b>Total Deck Usage:</b>        $SIZE_HOME
+<b>Games (Steam Shader/Common/Compat):</b>
+        Shadercache: $SIZE_SHADER
+        Common:      $SIZE_COMMON
+        Compatdata:  $SIZE_COMPAT
+        <b>Total Games Usage:</b> $SIZE_GAMING
+
+<b>Non-Steam Usage:</b>         $SIZE_NONSTEAM
+<b>Decky Loader:</b>            $SIZE_DECKY
+<b>Downloads:</b>               $SIZE_DL
+<b>Flatpak Apps:</b>            $SIZE_FLATPAK
+<b>Emulation Folder:</b>        $SIZE_EMU
+" --no-wrap
 }
+
 
 remove_downloading_files() {
   rm -rf "$HOME/.steam/steam/steamapps/downloading/*"
@@ -123,6 +185,42 @@ open_dolphin_common() {
   dolphin "$HOME/.steam/steam/steamapps/common/"
 }
 
+disable_decky_plugins() {
+  PLUGIN_DIR="$HOME/homebrew/plugins"
+  BACKUP_DIR="$HOME/homebrew/plugins_backup"
+
+  if [ ! -d "$PLUGIN_DIR" ]; then
+    zenity --error --text="Decky plugins folder not found at:\n$PLUGIN_DIR"
+    return
+  fi
+
+  mkdir -p "$BACKUP_DIR"
+
+  # Copy plugins to backup only if newer or missing
+  rsync -a --update "$PLUGIN_DIR"/ "$BACKUP_DIR"/
+
+  # Now clear the plugin directory without deleting the folder
+  find "$PLUGIN_DIR" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+
+  zenity --info --text="Plugins disabled. New or updated plugins were backed up to:\n$BACKUP_DIR"
+}
+
+enable_decky_plugins() {
+  PLUGIN_DIR="$HOME/homebrew/plugins"
+  BACKUP_DIR="$HOME/homebrew/plugins_backup"
+
+  if [ ! -d "$BACKUP_DIR" ]; then
+    zenity --error --text="No plugin backup found at:\n$BACKUP_DIR"
+    return
+  fi
+
+  mkdir -p "$PLUGIN_DIR"
+  cp -a "$BACKUP_DIR"/. "$PLUGIN_DIR"/
+  rm -rf "$BACKUP_DIR"
+
+  zenity --info --text="Plugins restored and backup folder deleted."
+}
+
 # --- GUI Loop ---
 
 while true; do
@@ -157,7 +255,7 @@ while true; do
       --text="Select the cleanup tasks to run:" \
       --column="Run" --column="Task" \
       "${CHECKLIST_ITEMS[@]}" \
-      --width=700 --height=700)
+      --width=700 --height=800)
 
     if [[ $? -ne 0 || -z "$CHOICES" ]]; then
       continue
@@ -177,17 +275,27 @@ while true; do
   TMP_LOG="/tmp/steamdeck_cleanup.log"
   > "$TMP_LOG"  # Clear previous run
 
-  (
-    for index in "${SELECTED_TASKS[@]}"; do
-      task_name="${OPTIONS[$index]}"
-      task_func="${FUNCTIONS[$index]}"
+	LOG_OUTPUT=$(
+	  for index in "${SELECTED_TASKS[@]}"; do
+		task_name="${OPTIONS[$index]}"
+		task_func="${FUNCTIONS[$index]}"
 
-      echo "==================================="
-      echo ">> Running: $task_name"
-      echo "==================================="
-      $task_func 2>&1
-      echo ">> Completed: $task_name"
-      echo ""
-    done
-  ) | tee "$TMP_LOG" | zenity --text-info --title="Steam Deck Cleanup - Combined Log" --width=700 --height=500
+		if [[ "$task_func" == "disk_usage" ]]; then
+		  $task_func
+		  continue
+		fi
+
+		echo "==================================="
+		echo ">> Running: $task_name"
+		echo "==================================="
+		$task_func 2>&1
+		echo ">> Completed: $task_name"
+		echo ""
+	  done
+	)
+
+	# Write to log only if there is content
+	if [[ -n "$LOG_OUTPUT" ]]; then
+	  echo "$LOG_OUTPUT" | tee "$TMP_LOG" | zenity --text-info --title="Steam Deck Cleanup - Combined Log" --width=700 --height=500
+	fi
 done
