@@ -3,17 +3,17 @@ It removes downloading game files, shader caches, unused flakpaks, library cache
 
 Don't forget to make it executable:
 
-chmod +x CleanMyDeck.sh
+- chmod +x CleanMyDeck.sh
 
-chmod +x Update_CleanMyDeck.sh
+- chmod +x Update_CleanMyDeck.sh
 
 Run it like this:
 
-sudo ./CleanMyDeck.sh
+- sudo ./CleanMyDeck.sh
 
 And to update it:
 
-./Update_CleanMyDeck.sh
+- ./Update_CleanMyDeck.sh
 
 
 Here are the sections in the script:
