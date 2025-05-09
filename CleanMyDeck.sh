@@ -18,7 +18,7 @@ OPTIONS=(
   "Disable Decky Loader Plugins"
   "Enable Decky Loader Plugins"
   "Disk Usage"
-  "Execution Log File"
+  "Export Execution Log File"
   "Reboot"
 )
 
