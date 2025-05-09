@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPO_URL="https://github.com/ruifcastro/CleanMyDeck.git"
-TARGET_DIR="$HOME/homebrew/plugins/CleanMyDeck"
+TARGET_DIR="$HOME/CleanMyDeck"
 
 if [ ! -d "$TARGET_DIR/.git" ]; then
   rm -rf "$TARGET_DIR"
