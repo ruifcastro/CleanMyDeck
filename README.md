@@ -23,4 +23,9 @@ Here are the sections in the script:
 - Remove User Cache"
 - Manual Removal of Uninstalled Game Compatdata (using zShaderCacheKiller.sh)
 - Manual Removal of Common Game Folders (using Dolphin)
+- Disk Usage (NonSteam Storage)
+- Disable Decky Loader Plugins
+- Enable Decky Loader Plugins
 - Execution Log File
+
+Added the possibility to disable and enable Decky Loader plugins. I think this is useful to help with detect why you are losing FPSs or having strange spikes.
