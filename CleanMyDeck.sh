@@ -70,7 +70,7 @@ disk_usage() {
 }
 
 remove_downloading_files() {
-  rm -rf "$HOME/.steam/steam/steamapps/downloading/"
+  rm -rf "$HOME/.steam/steam/steamapps/downloading/*"
 }
 
 remove_flatpak_unused_apps() {
@@ -82,19 +82,19 @@ repair_flatpak() {
 }
 
 remove_shader_cache() {
-  rm -rf "$HOME/.steam/steam/steamapps/shadercache/"
+  rm -rf "$HOME/.steam/steam/steamapps/shadercache/*"
 }
 
 remove_library_cache() {
-  rm -rf "$HOME/.local/share/Steam/appcache/librarycache/"
+  rm -rf "$HOME/.local/share/Steam/appcache/librarycache/*"
 }
 
 remove_steam_logs() {
-  rm -rf "$HOME/.local/share/Steam/logs/"
+  rm -rf "$HOME/.local/share/Steam/logs/*"
 }
 
 remove_trash() {
-  rm -rf "$HOME/.local/share/Trash/"
+  rm -rf "$HOME/.local/share/Trash/*"
 }
 
 reduce_swap() {
@@ -107,7 +107,7 @@ reduce_swap() {
 fix_config_library_cache() {
   STEAM_USERDATA_PATH="$HOME/.local/share/Steam/userdata"
   if [ -d "$STEAM_USERDATA_PATH" ]; then
-    find "$STEAM_USERDATA_PATH" -type d -path "*/config/librarycache" -print -exec rm -rf {} +
+    find "$STEAM_USERDATA_PATH" -type d -path "*/config/librarycache/*" -print -exec rm -rf {} +
   fi
 }
 
