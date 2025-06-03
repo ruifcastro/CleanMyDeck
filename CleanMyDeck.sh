@@ -15,8 +15,6 @@ OPTIONS=(
   "Remove User Cache"
   "Manual Removal of Uninstalled Game Compatdata (using zShaderCacheKiller.sh)"
   "Manual Removal of Common Game Folders (using Dolphin)"
-  "Disable Decky Loader Plugins"
-  "Enable Decky Loader Plugins"
   "Disk Usage"
   "Execution Log File"
   "Reboot"
@@ -35,14 +33,64 @@ FUNCTIONS=(
   "remove_user_cache"
   "remove_compatdata"
   "open_dolphin_common"
-  "disable_decky_plugins"
-  "enable_decky_plugins"
   "disk_usage"
   "execution_log_file"
   "reboot_after_cleanup"
 )
 
 # --- Cleanup Functions ---
+
+ensure_steam_closed() {
+    echo "Checking if Steam is running..."
+    # Check for main Steam process and steamwebhelper processes
+    if pgrep -x "steam" > /dev/null || pgrep -f "steamwebhelper" > /dev/null; then
+        echo "Steam process(es) detected. Attempting to close..."
+            
+        if command -v steam > /dev/null; then
+            echo "Attempting graceful shutdown with 'steam -shutdown'..."
+            steam -shutdown > /dev/null 2>&1 & 
+                
+            local countdown=5 # Shorter wait for simplicity
+            echo -n "Waiting for graceful shutdown (up to $countdown seconds): "
+            while [[ $countdown -gt 0 ]]; do
+                echo -n "." # Simpler progress indicator
+                if ! (pgrep -x "steam" > /dev/null || pgrep -f "steamwebhelper" > /dev/null); then
+                    echo " Steam closed gracefully."
+                    return 0 # Success
+                fi
+                sleep 1
+                countdown=$((countdown - 1))
+            done
+            echo " Graceful shutdown period ended."
+        else
+            echo "'steam' command not found for graceful shutdown. Proceeding to force close."
+        fi
+
+        # If still running, try killall
+        if pgrep -x "steam" > /dev/null || pgrep -f "steamwebhelper" > /dev/null; then
+            echo "Steam still running. Attempting to terminate processes with killall -TERM..."
+            killall -TERM steam steamwebhelper > /dev/null 2>&1
+            sleep 2 # Give processes time to terminate
+
+            if pgrep -x "steam" > /dev/null || pgrep -f "steamwebhelper" > /dev/null; then
+                echo "Processes still active after TERM signal. Attempting killall -KILL..."
+                killall -KILL steam steamwebhelper > /dev/null 2>&1
+                sleep 1 # Give processes time to be killed
+            fi
+        fi
+
+        if pgrep -x "steam" > /dev/null || pgrep -f "steamwebhelper" > /dev/null; then
+            echo "WARNING: Steam may still be running after attempts to close it."
+            return 1 # Indicate it might still be running
+        else
+            echo "Steam appears to be closed."
+            return 0 # Success
+        fi
+    else
+        echo "Steam is not running."
+        return 0 # Steam was not running
+    fi
+}
 
 reboot_after_cleanup() {
   zenity --question --text="Cleanup complete. Reboot now?" --width=400
@@ -133,6 +181,7 @@ disk_usage() {
 
 
 remove_downloading_files() {
+  ensure_steam_closed
   rm -rf "/home/deck/.steam/steam/steamapps/downloading/*"
 }
 
@@ -141,7 +190,10 @@ remove_flatpak_unused_apps() {
 }
 
 repair_flatpak() {
+  flatpak remote-add --if-not-exists flathub
   flatpak repair
+  systemctl restart flatpak-system-helper.service
+  flatpak update
 }
 
 remove_shader_cache() {
@@ -243,7 +295,7 @@ while true; do
   if [[ "$MODE" == "Select All Tasks" ]]; then
     SELECTED_TASKS=("${!FUNCTIONS[@]}")
   elif [[ "$MODE" == "Select Cleanup Only" ]]; then
-    SELECTED_TASKS=(0 1 3 4 5 6 7 9 10 11 12 14)
+    SELECTED_TASKS=(0 1 3 4 5 6 7 8 9 10 11 12 14)
   else
     # Build checklist with properly quoted values
     CHECKLIST_ITEMS=()
