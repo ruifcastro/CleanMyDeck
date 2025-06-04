@@ -308,7 +308,7 @@ while true; do
       --text="Select the cleanup tasks to run:" \
       --column="Run" --column="Task" \
       "${CHECKLIST_ITEMS[@]}" \
-      --width=700 --height=800)
+      --width=700 --height=700)
 
     if [[ $? -ne 0 || -z "$CHOICES" ]]; then
       continue
