@@ -182,7 +182,7 @@ disk_usage() {
 
 remove_downloading_files() {
   ensure_steam_closed
-  rm -rf "/home/deck/.steam/steam/steamapps/downloading/*"
+  rm -rf "/home/deck/.steam/steam/steamapps/downloading/"*
 }
 
 remove_flatpak_unused_apps() {
@@ -197,19 +197,19 @@ repair_flatpak() {
 }
 
 remove_shader_cache() {
-  rm -rf "/home/deck/.steam/steam/steamapps/shadercache/*"
+  rm -rf "/home/deck/.steam/steam/steamapps/shadercache/"*
 }
 
 remove_library_cache() {
-  rm -rf "/home/deck/.local/share/Steam/appcache/librarycache/*"
+  rm -rf "/home/deck/.local/share/Steam/appcache/librarycache/"*
 }
 
 remove_steam_logs() {
-  rm -rf "/home/deck/.local/share/Steam/logs/*"
+  rm -rf "/home/deck/.local/share/Steam/logs/"*
 }
 
 remove_trash() {
-  rm -rf "/home/deck/.local/share/Trash/*"
+  rm -rf "/home/deck/.local/share/Trash/"*
 }
 
 reduce_swap() {
